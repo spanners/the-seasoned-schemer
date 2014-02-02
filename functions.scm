@@ -195,7 +195,7 @@
 ; --------------------------
 ; Use (letrec ...) to hide and protect functions.
 
-(define union-letwrecked
+(define union-letrec
   (lambda (set1 set2)
     (letrec
       ((U (lambda (set)
@@ -215,3 +215,38 @@
 			  (N? (cdr lat)))))))
 	       (N? lat)))))
       (U set1))))
+
+(define two-in-a-row-letrec?
+  (letrec
+    ((W (lambda (a lat)
+	  (cond
+	    ((null? lat) #f)
+	    (else (or (eq? (car lat) a)
+		      (W (car lat)
+			 (cdr lat))))))))
+    (lambda (lat)
+	(W (car lat) (cdr lat)))))
+
+(define sum-of-prefixes-letrec
+  (letrec
+    ((S (lambda (sss tup)
+	  (cond
+	    ((null? tup) (quote ()))
+	    (else
+	      (cons (+ sss (car tup))
+		    (S (+ sss (car tup))
+		       (cdr tup))))))))
+    (lambda (tup)
+      (S 0 tup))))
+
+(define scramble-letrec
+  (letrec
+    ((P (lambda (tup rp)
+	  (cond
+	    ((null? tup) (quote ()))
+	    (else (cons (pick (car tup)
+			      (cons (car tup) rp))
+			(P (cdr tup)
+			   (cons (car tup) rp))))))))
+    (lambda (tup)
+      (P tup (quote ())))))
