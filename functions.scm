@@ -5,6 +5,15 @@
     (and (not (pair? x)) 
 	 (not (null? x)))))
 
+(define one?
+  (lambda (x) (= x 1)))
+
+(define sub1
+  (lambda (x) (- x 1)))
+
+(define add1
+  (lambda (x) (+ x 1)))
+
 (define two-in-a-row?
   (lambda (lat)
     (cond
@@ -59,5 +68,99 @@
 ; The Eleventh Commandment:
 ; -------------------------
 ; Use additional arguments when a function needs to know what other arguments to the function have been like so far.
+
+(define pick
+  (lambda (n lat)
+    (cond
+      ((one? n) (car lat))
+      (else
+	(pick (sub1 n) (cdr lat))
+	)
+      )
+    )
+  )
+
+(define scramble
+  (lambda (tup)
+    (scramble-b tup (quote ()))))
+
+(define scramble-b
+  (lambda (tup rev-pre)
+    (cond
+      ((null? tup) (quote ()))
+      (else
+	(cons (pick (car tup)
+		    (cons (car tup) rev-pre))
+	      (scramble-b (cdr tup)
+			  (cons (car tup) rev-pre)))
+	)
+      )
+    )
+  )
+
+; Chapter 12: Take Cover
+
+; `letrec' defines and returns a recursive function
+
+(define multirember
+  (lambda (a lat)
+    ((letrec
+       ((mr (lambda (lat)
+	      (cond
+		((null? lat) (quote ()))
+		((eq? a (car lat))
+		 (mr (cdr lat)))
+		(else
+		  (cons (car lat)
+			(mr (cdr lat))))))))
+	mr)
+     lat)))
+
+(define multirember2
+  (lambda (a lat)
+    (letrec
+      ((mr (lambda (lat)
+	     (cond
+	       ((null? lat) (quote ()))
+	       ((eq? a (car lat))
+		(mr (cdr lat)))
+	       (else
+		 (cons (car lat)
+		       (mr (cdr lat))))))))
+      (mr lat))))
+
+; The Twelfth Commandment
+; -----------------------
+; Use (letrec ...) to remove arguments that do not change for recursive applications
+
+(define multirember-f
+  (lambda (test?)
+    (lambda (a lat)
+      (cond
+        ((null? lat) (quote ()))
+        ((test? a (car lat))
+         ((multirember-f test?) a (cdr lat)))
+        (else
+	  (cons (car lat)
+		((multirember-f test?) a (cdr lat)))
+	  )
+	)
+      )
+    )
+  )
+
+(define multirember-f2
+  (lambda (test?)
+    (letrec
+      ((m-f
+	 (lambda (a lat)
+	   (cond
+	     ((null? lat) (quote ()))
+	     ((test? (car lat) a)
+	      (m-f a (cdr lat)))
+	     (else
+	       (cons (car lat)
+		     (m-f a (cdr lat))))))))
+      m-f)))
 
 
