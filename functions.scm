@@ -39,3 +39,25 @@
       )
     )
   )
+
+(define sum-of-prefixes
+  (lambda (tup)
+    (sum-of-prefixes-b 0 tup)))
+
+(define sum-of-prefixes-b
+  (lambda (preceeding tup)
+    (cond
+      ((null? tup) (quote ()))
+      (else
+	(cons (+ preceeding (car tup)) 
+	      (sum-of-prefixes-b (+ preceeding (car tup)) (cdr tup)))
+	)
+      )
+    )
+  )
+
+; The Eleventh Commandment:
+; -------------------------
+; Use additional arguments when a function needs to know what other arguments to the function have been like so far.
+
+
