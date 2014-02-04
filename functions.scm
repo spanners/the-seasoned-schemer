@@ -281,20 +281,38 @@
 
 
 ; I dunno... This looks horrible. If we're doing sanity checks why not just check if there's () in lset FIRST, along with the outer (cond)?
-(define intersectall-cc
+
+(define intersectall-ap
   (lambda (lset)
     (call-with-current-continuation
       (lambda (hop)
-	(letrec
-	  ((A (lambda (lset)
-		(cond
-		  ((null? (car lset))
-		   (hop (quote ())))
-		  ((null? (cdr lset))
-		   (car lset))
-		  (else
-		    (intersect (car lset)
-			       (A (cdr lset))))))))
-	  (cond
-	    ((null? lset) (quote ()))
-	    (else (A lset))))))))
+        (letrec
+          ((A (lambda (lset)
+                (cond
+                  ((null? (car lset)) (hop '()))
+                  ((null? (cdr lset)) (car lset))
+                  (else
+                    (I (car lset)
+                       (A (cdr lset)))))))
+           (I (lambda (s1 s2)
+                (letrec
+                  ((J (lambda (s1)
+                        (cond
+                          ((null? s1) '())
+                          ((member? (car s1) s2)
+                           (cons (car s1) (J (cdr s1))))
+                          (else
+                            (J (cdr s1)))))))
+                  (cond
+                    ((null? s2) (hop '()))
+                    (else (J s1)))))))
+          (cond
+            ((null? lset) '())
+            (else (A lset))))))))
+
+; The Fourteenth Commandment: 
+; ---------------------------
+; Use call-with-current-continuation to return values abruptly and promptly
+
+
+
