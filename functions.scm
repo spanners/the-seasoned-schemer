@@ -315,4 +315,37 @@
 ; Use call-with-current-continuation to return values abruptly and promptly
 
 
+(define rember
+  (lambda (a lat)
+    (letrec
+      ((R (lambda (lat)
+	    (cond
+	      ((null? lat) (quote ()))
+	      ((eq? (car lat) a) (R (cdr lat)))
+	      (else
+		(cons (car lat) (R (cdr lat))))))))
+      (R lat))))
 
+(define rember-beyond-first
+  (lambda (a lat)
+    (letrec
+      ((R (lambda (lat)
+	    (cond
+	      ((null? lat) (quote ()))
+	      ((eq? (car lat) a) (quote ()))
+	      (else
+		(cons (car lat) (R (cdr lat))))))))
+      (R lat))))
+
+(define rember-upto-last
+  (lambda (a lat)
+    (call-with-current-continuation
+      (lambda (skip)
+	(letrec
+	  ((R (lambda (lat)
+		(cond
+		  ((null? lat) (quote ()))
+		  ((eq? (car lat) a) (skip (R (cdr lat))))
+		  (else
+		    (cons (car lat) (R (cdr lat))))))))
+	  (R lat))))))
